@@ -532,7 +532,7 @@ static void EmitPrimary(void)
 {
   if (CurrentToken.Kind == TokenNumber)
   {
-    EmitFmt2I("mov eax, %ld", CurrentToken.NumberValue);
+    EmitFmt2I("mov   eax,%ld", CurrentToken.NumberValue);
     AdvanceToken();
     return;
   }
@@ -547,7 +547,7 @@ static void EmitPrimary(void)
 
     {
       char *Name = ConsumeIdentifierOrFail("Expected identifier.");
-      EmitFmt2("mov eax, dword [%s]", Name);
+      EmitFmt2("mov   eax,[%s]", Name);
       free(Name);
       return;
     }
@@ -577,7 +577,7 @@ static void EmitUnary(void)
   {
     AdvanceToken();
     EmitUnary();
-    EmitLine2("neg eax");
+    EmitLine2("neg   eax");
     return;
   }
 
@@ -585,9 +585,9 @@ static void EmitUnary(void)
   {
     AdvanceToken();
     EmitUnary();
-    EmitLine2("cmp eax, 0");
-    EmitLine2("sete al");
-    EmitLine2("movzx eax, al");
+    EmitLine2("cmp   eax,0");
+    EmitLine2("sete  al");
+    EmitLine2("movzx eax,al");
     return;
   }
 
@@ -605,13 +605,13 @@ static void EmitMul(void)
     TokenKind Op = CurrentToken.Kind;
     AdvanceToken();
 
-    EmitLine2("push eax");
+    EmitLine2("push  eax");
     EmitUnary();
-    EmitLine2("pop ecx"); /* ECX = left, EAX = right */
+    EmitLine2("pop   ecx"); /* ECX = left, EAX = right */
 
     if (Op == TokenStar)
     {
-      EmitLine2("imul eax, ecx");
+      EmitLine2("imul  eax,ecx");
     }
     else if (Op == TokenSlash || Op == TokenPercent)
     {
@@ -619,18 +619,18 @@ static void EmitMul(void)
       * idiv uses EDX:EAX as dividend and a register/mem operand as divisor.
       * We'll put divisor in EBX, while preserving EBX across the operation.
       */
-      EmitLine2("push ebx");
-      EmitLine2("mov ebx, eax"); /* EBX = right (divisor) */
-      EmitLine2("mov eax, ecx"); /* EAX = left (dividend low) */
-      EmitLine2("cdq");          /* sign-extend EAX into EDX:EAX */
-      EmitLine2("idiv ebx");     /* quotient in EAX, remainder in EDX */
+      EmitLine2("push  ebx");
+      EmitLine2("mov   ebx,eax"); /* EBX = right (divisor) */
+      EmitLine2("mov   eax,ecx"); /* EAX = left (dividend low) */
+      EmitLine2("cdq");           /* sign-extend EAX into EDX:EAX */
+      EmitLine2("idiv  ebx");     /* quotient in EAX, remainder in EDX */
 
       if (Op == TokenPercent)
       {
-        EmitLine2("mov eax, edx");
+        EmitLine2("mov   eax,edx");
       }
 
-      EmitLine2("pop ebx");
+      EmitLine2("pop   ebx");
     }
   }
 }
@@ -644,18 +644,18 @@ static void EmitAdd(void)
     TokenKind Op = CurrentToken.Kind;
     AdvanceToken();
 
-    EmitLine2("push eax");
+    EmitLine2("push  eax");
     EmitMul();
-    EmitLine2("pop ecx"); /* ECX = left, EAX = right */
+    EmitLine2("pop   ecx"); /* ECX = left, EAX = right */
 
     if (Op == TokenPlus)
     {
-      EmitLine2("add eax, ecx"); /* EAX = right + left */
+      EmitLine2("add   eax,ecx"); /* EAX = right + left */
     }
     else
     {
-      EmitLine2("sub ecx, eax"); /* ECX = left - right */
-      EmitLine2("mov eax, ecx");
+      EmitLine2("sub   ecx,eax"); /* ECX = left - right */
+      EmitLine2("mov   eax, ecx");
     }
   }
 }
@@ -672,18 +672,18 @@ static void EmitRelational(void)
     TokenKind Op = CurrentToken.Kind;
     AdvanceToken();
 
-    EmitLine2("push eax");
+    EmitLine2("push  eax");
     EmitAdd();
-    EmitLine2("pop ecx"); /* ECX = left, EAX = right */
+    EmitLine2("pop   ecx"); /* ECX = left, EAX = right */
 
-    EmitLine2("cmp ecx, eax");
+    EmitLine2("cmp   ecx,eax");
 
-    if (Op == TokenLt)   EmitLine2("setl al");
+    if (Op == TokenLt)   EmitLine2("setl  al");
     if (Op == TokenLtEq) EmitLine2("setle al");
-    if (Op == TokenGt)   EmitLine2("setg al");
+    if (Op == TokenGt)   EmitLine2("setg  al");
     if (Op == TokenGtEq) EmitLine2("setge al");
 
-    EmitLine2("movzx eax, al");
+    EmitLine2("movzx eax,al");
   }
 }
 
@@ -696,16 +696,16 @@ static void EmitEquality(void)
     TokenKind Op = CurrentToken.Kind;
     AdvanceToken();
 
-    EmitLine2("push eax");
+    EmitLine2("push  eax");
     EmitRelational();
-    EmitLine2("pop ecx"); /* ECX = left, EAX = right */
+    EmitLine2("pop   ecx"); /* ECX = left, EAX = right */
 
-    EmitLine2("cmp ecx, eax");
+    EmitLine2("cmp   ecx,eax");
 
-    if (Op == TokenEqEq)  EmitLine2("sete al");
+    if (Op == TokenEqEq)  EmitLine2("sete  al");
     if (Op == TokenNotEq) EmitLine2("setne al");
 
-    EmitLine2("movzx eax, al");
+    EmitLine2("movzx eax,al");
   }
 }
 
@@ -723,7 +723,7 @@ static void EmitAssignmentOrEquality(void)
     EmitAssignmentOrEquality();
 
     /* store result into global variable */
-    EmitFmt2("mov dword [%s], eax", Name);
+    EmitFmt2("mov   [%s],eax", Name);
 
     free(Name);
     return;
@@ -770,15 +770,15 @@ static void EmitIf(void)
   MakeUniqueLabel(ElseLabel, sizeof(ElseLabel), "else");
   MakeUniqueLabel(EndLabel, sizeof(EndLabel), "endif");
 
-  EmitLine2("cmp eax, 0");
-  EmitFmt2("je %s", ElseLabel);
+  EmitLine2("cmp   eax,0");
+  EmitFmt2("je    %s",ElseLabel);
 
   EmitStatement();
 
   if (CurrentToken.Kind == TokenElse)
   {
     AdvanceToken();
-    EmitFmt2("jmp %s", EndLabel);
+    EmitFmt2("jmp    %s",EndLabel);
     EmitLabel(ElseLabel);
     EmitStatement();
     EmitLabel(EndLabel);
@@ -804,12 +804,12 @@ static void EmitWhile(void)
   EmitExpression();
   Expect(TokenRParen, "')'");
 
-  EmitLine2("cmp eax, 0");
-  EmitFmt2("je %s", EndLabel);
+  EmitLine2("cmp   eax,0");
+  EmitFmt2("je    %s",EndLabel);
 
   EmitStatement();
 
-  EmitFmt2("jmp %s", TopLabel);
+  EmitFmt2("jmp    %s",TopLabel);
   EmitLabel(EndLabel);
 }
 
@@ -834,7 +834,7 @@ static void EmitCallStatement(void)
   Expect(TokenLParen, "'('");
   Expect(TokenRParen, "')'");
   Expect(TokenSemicolon, "';'");
-  EmitFmt2("call %s", Name);
+  EmitFmt2("call  %s",Name);
 
   free(Name);
 }
@@ -945,7 +945,7 @@ static void EmitGlobals(void)
     EmitLine0("align 4");
     {
       char Buf[512];
-      snprintf(Buf, sizeof(Buf), "%s: dd 0", DefinedGlobals.Items[I]);
+      snprintf(Buf, sizeof(Buf), "%s dd 0", DefinedGlobals.Items[I]);
       EmitLine0(Buf);
     }
   }
