@@ -655,7 +655,7 @@ static void EmitAdd(void)
     else
     {
       EmitLine2("sub   ecx,eax"); /* ECX = left - right */
-      EmitLine2("mov   eax, ecx");
+      EmitLine2("mov   eax,ecx");
     }
   }
 }
