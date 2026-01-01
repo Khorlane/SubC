@@ -1,6 +1,7 @@
 # SubC
 
-SubC is a minimal C-like language that compiles a restricted subset of C to NASM (i386) assembly code. It is designed for educational purposes and simple code generation, focusing on clarity and simplicity.
+SubC is a minimal C-like language that compiles a restricted subset of C to NASM (i386) assembly code. It is 
+a tool to assist with AsmOSx86, A Hobbyist Operating System in x86 Assembly.
 
 ## Features
 - Only global integer variables: `int Name;` (no initializers)
