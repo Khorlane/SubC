@@ -1,0 +1,6 @@
+int FortyTwo; 
+void TestIt()
+{
+  FortyTwo = 42; 
+  return;
+}
