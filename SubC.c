@@ -4,8 +4,9 @@
 *
 * SubC rules (as implemented here):
 * - Only global variables:   int Name;
-*   - No initializers. Always emits: Name: dd 0
-* - Only standalone functions: void Name() { ... }
+*   - No initializers. Always emits: Name dd 0
+* - Standalone functions: void Name() { ... }
+*   - Current parser emits one function per input unit.
 * - No parameters. No local variables.
 * - return; only (no return value)
 * - Statements: blocks, if/else, while, expression statements, function call statements

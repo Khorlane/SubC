@@ -5,7 +5,8 @@ a tool to assist with AsmOSx86, A Hobbyist Operating System in x86 Assembly.
 
 ## Features
 - Only global integer variables: `int Name;` (no initializers)
-- Only standalone functions: `void Name() { ... }`
+- Standalone functions: `void Name() { ... }`
+- Current parser emits one function per input unit.
 - No function parameters or local variables
 - Only `return;` (no return values)
 - Supported statements: blocks, `if`/`else`, `while`, expression statements, function call statements
@@ -42,8 +43,8 @@ align 4
 FortyTwo dd 0
 
 TestIt:
-  mov   eax, 42
-  mov   [FortyTwo], eax
+  mov   eax,42
+  mov   [FortyTwo],eax
   ret
 ```
 
