@@ -1,3 +1,6 @@
 .vs/
 SubC/
 x64/
+bin/
+obj/
+build/*.pdb

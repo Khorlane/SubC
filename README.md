@@ -21,7 +21,10 @@ a tool to assist with AsmOSx86, A Hobbyist Operating System in x86 Assembly.
 
 ## Usage
 - The program reads a `.subc` source file and writes NASM assembly to standard output.
-- .\x64\Debug\SubC.exe Test.subc > Test.asm
+- Build the compiler, then run:
+```
+.\bin\SubC.exe Test.subc > Test.asm
+```
 - Very simple example for Test.subc:
 ```
 int FortyTwo; 
@@ -45,7 +48,17 @@ TestIt:
 ```
 
 ## Building
-Open the solution in Visual Studio and build the project. The main source file is `SubC.c`.
+This project is built from VS Code with a small MSBuild wrapper. From PowerShell:
+```
+.\Build.ps1
+```
+
+To clean generated files:
+```
+.\Build.ps1 -Clean
+```
+
+The script locates Visual Studio Build Tools with `vswhere`, loads the MSVC developer environment, and builds `SubC.c` through `build\SubC.compile.proj`.
 
 ## License
 This project is licensed under the UNLICENSE. See the LICENSE file for details.
